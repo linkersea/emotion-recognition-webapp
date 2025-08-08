@@ -89,15 +89,17 @@ https://your-app-name.up.railway.app
 
 ## 🔧 常见问题解决
 
-### 1. 模型文件过大
-如果遇到模型文件太大无法上传的问题：
+### 1. 模型文件管理 ✅
+项目已经配置了Git LFS来管理大文件（模型文件）：
 
+- 模型文件 `emotion_resnet_VGG16_best.pth` (2GB) 使用Git LFS管理
+- GitHub和Railway都支持Git LFS
+- 无需额外操作，模型会自动下载
+
+如果需要手动验证LFS状态：
 ```bash
-# 使用Git LFS管理大文件
-git lfs install
-git lfs track "*.pth"
-git add .gitattributes
-git add models/saved_models/emotion_resnet_VGG16_best.pth
+git lfs ls-files  # 查看LFS管理的文件
+```
 git commit -m "Add model file with LFS"
 git push
 ```
