@@ -1,0 +1,8 @@
+# Git LFS配置 - 大文件管理
+*.pth filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+
+# 确保模型文件使用LFS
+models/**/*.pth filter=lfs diff=lfs merge=lfs -text

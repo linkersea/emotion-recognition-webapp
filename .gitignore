@@ -116,7 +116,7 @@ Thumbs.db
 # Dataset files (too large for git)
 archive/
 datasets/
-*.pth
+# *.pth  # 注释掉，改用Git LFS管理模型文件
 *.pkl
 *.h5
 
