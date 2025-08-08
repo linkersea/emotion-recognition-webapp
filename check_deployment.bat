@@ -1,78 +1,79 @@
 @echo off
+chcp 65001 >nul
 echo ========================================
-echo 部署前检查 - 确保所有文件就绪
+echo Pre-deployment Check - Ensure all files ready
 echo ========================================
 echo.
 
-echo 检查必要文件...
+echo Checking required files...
 echo.
 
 if exist "Procfile" (
-    echo ✅ Procfile - Railway部署配置
+    echo [OK] Procfile - Railway deployment config
 ) else (
-    echo ❌ 缺少 Procfile
+    echo [MISSING] Procfile
 )
 
 if exist "requirements.txt" (
-    echo ✅ requirements.txt - Python依赖
+    echo [OK] requirements.txt - Python dependencies
 ) else (
-    echo ❌ 缺少 requirements.txt
+    echo [MISSING] requirements.txt
 )
 
 if exist "runtime.txt" (
-    echo ✅ runtime.txt - Python版本
+    echo [OK] runtime.txt - Python version
 ) else (
-    echo ❌ 缺少 runtime.txt
+    echo [MISSING] runtime.txt
 )
 
 if exist "railway.toml" (
-    echo ✅ railway.toml - Railway配置
+    echo [OK] railway.toml - Railway config
 ) else (
-    echo ❌ 缺少 railway.toml
+    echo [MISSING] railway.toml
 )
 
 if exist ".gitignore" (
-    echo ✅ .gitignore - Git忽略文件
+    echo [OK] .gitignore - Git ignore file
 ) else (
-    echo ❌ 缺少 .gitignore
+    echo [MISSING] .gitignore
 )
 
 if exist ".gitattributes" (
-    echo ✅ .gitattributes - Git LFS配置
+    echo [OK] .gitattributes - Git LFS config
 ) else (
-    echo ❌ 缺少 .gitattributes
+    echo [MISSING] .gitattributes
 )
 
 if exist "models\saved_models\emotion_resnet_VGG16_best.pth" (
-    echo ✅ 模型文件存在
+    echo [OK] Model file exists
 ) else (
-    echo ❌ 缺少模型文件
+    echo [MISSING] Model file
 )
 
 if exist "web\backend\app.py" (
-    echo ✅ 后端应用
+    echo [OK] Backend application
 ) else (
-    echo ❌ 缺少后端应用
+    echo [MISSING] Backend application
 )
 
 if exist "web\frontend\index.html" (
-    echo ✅ 前端页面
+    echo [OK] Frontend page
 ) else (
-    echo ❌ 缺少前端页面
+    echo [MISSING] Frontend page
 )
 
 echo.
-echo 检查Git LFS状态...
+echo Checking Git LFS status...
 git lfs ls-files
 
 echo.
-echo 检查Git状态...
+echo Checking Git status...
 git status --short
 
 echo.
 echo ========================================
-echo 检查完成！如果所有项目都显示 ✅，
-echo 那么你的项目已经准备好部署了！
+echo Check completed! If all items show [OK],
+echo your project is ready for deployment!
 echo ========================================
 echo.
 pause
