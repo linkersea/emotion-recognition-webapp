@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Recognition & Interactive System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .emotion-result {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .emotion-emoji {
+            font-size: 4rem;
+            margin: 10px 0;
+        }
+        
+        .confidence-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .confidence-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        
+        .chat-message.user {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .chat-message.bot {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 30px;
+            color: white;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 10px 0;
+        }
+        
+        .webcam-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #webcam {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container p-4">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-smile-beam"></i> Emotion Recognition & Interactive System
+                </h1>
+                <p class="lead">Upload images or use webcam to recognize emotions and get intelligent responses</p>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="upload-tab" data-bs-toggle="tab" href="#upload-panel">
+                        <i class="fas fa-cloud-upload-alt"></i> Image Upload
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="webcam-tab" data-bs-toggle="tab" href="#webcam-panel">
+                        <i class="fas fa-video"></i> Webcam
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="batch-tab" data-bs-toggle="tab" href="#batch-panel">
+                        <i class="fas fa-images"></i> Batch Processing
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Image Upload Panel -->
+                <div class="tab-pane fade show active" id="upload-panel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                <h4>Click or drag to upload image</h4>
+                                <p class="text-muted">Supports JPG, PNG, JPEG formats</p>
+                                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                            </div>
+                            
+                            <div id="imagePreview" class="mt-3" style="display: none;">
+                                <img id="previewImg" class="preview-image">
+                            </div>
+                            
+                            <div class="mt-3">
+                                <label for="userInput" class="form-label">Additional Comments (Optional):</label>
+                                <textarea id="userInput" class="form-control" rows="3" 
+                                         placeholder="Tell me your thoughts or feelings..."></textarea>
+                                <small class="text-muted">💡 AI will automatically generate professional emotional support responses based on your expression</small>
+                            </div>
+                            
+                            <button id="analyzeBtn" class="btn btn-custom w-100 mt-3" disabled>
+                                <i class="fas fa-magic"></i> Start AI Emotion Analysis
+                            </button>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div id="loadingSpinner" class="loading">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Analyzing...</span>
+                                </div>
+                                <p class="mt-2">Analyzing emotions...</p>
+                            </div>
+                            
+                            <div id="resultContainer" style="display: none;">
+                                <div class="emotion-result">
+                                    <div class="emotion-emoji" id="emotionEmoji">😊</div>
+                                    <h3 id="emotionName">Happy</h3>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" id="confidenceBar" style="width: 0%"></div>
+                                    </div>
+                                    <p id="confidenceText">Confidence: 0%</p>
+                                </div>
+                                
+                                <div class="stats-card">
+                                    <h5><i class="fas fa-chart-bar"></i> Detailed Analysis</h5>
+                                    <div id="probabilityChart" class="chart-container"></div>
+                                </div>
+                                
+                                <div class="stats-card">
+                                    <h5><i class="fas fa-comments"></i> AI Response</h5>
+                                    <div id="chatContainer" class="chat-container">
+                                        <div id="aiResponse" class="chat-message bot"></div>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <input type="text" id="chatInput" class="form-control" 
+                                               placeholder="Enter your response...">
+                                        <button id="sendChatBtn" class="btn btn-custom w-100 mt-2">
+                                            <i class="fas fa-paper-plane"></i> Send
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Webcam Panel -->
+                <div class="tab-pane fade" id="webcam-panel">
+                    <div class="webcam-container">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <video id="webcam" width="640" height="480" autoplay style="display: none;"></video>
+                                <canvas id="webcamCanvas" width="640" height="480" style="display: none;"></canvas>
+                                
+                                <div class="mt-3">
+                                    <button id="startWebcamBtn" class="btn btn-custom me-2">
+                                        <i class="fas fa-play"></i> Start Webcam
+                                    </button>
+                                    <button id="captureBtn" class="btn btn-success me-2" disabled>
+                                        <i class="fas fa-camera"></i> Capture & Analyze
+                                    </button>
+                                    <button id="stopWebcamBtn" class="btn btn-danger" disabled>
+                                        <i class="fas fa-stop"></i> Stop Webcam
+                                    </button>
+                                </div>
+                                
+                                <div id="webcamResult" class="mt-4" style="display: none;">
+                                    <!-- Webcam results will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Batch Processing Panel -->
+                <div class="tab-pane fade" id="batch-panel">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="upload-area" id="batchUploadArea">
+                                <i class="fas fa-images fa-3x text-primary mb-3"></i>
+                                <h4>Select multiple images for batch analysis</h4>
+                                <p class="text-muted">You can select multiple files at once</p>
+                                <input type="file" id="batchImageInput" accept="image/*" multiple style="display: none;">
+                            </div>
+                            
+                            <div id="batchProgress" class="mt-3" style="display: none;">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="batchResults" class="row mt-4">
+                                <!-- Batch results will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let webcamStream = null;
+        let currentEmotion = null;
+        
+        // DOM elements
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        // Upload area events
+        uploadArea.addEventListener('click', () => imageInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        
+        imageInput.addEventListener('change', handleFileSelect);
+        analyzeBtn.addEventListener('click', analyzeImage);
+        
+        // Drag and drop event handling
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+                analyzeBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Analyze image
+        async function analyzeImage() {
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+            
+            const userInput = document.getElementById('userInput').value;
+            if (userInput.trim()) {
+                formData.append('user_input', userInput);
+            }
+            
+            // Show loading state
+            loadingSpinner.style.display = 'block';
+            resultContainer.style.display = 'none';
+            analyzeBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayResult(result);
+                } else {
+                    alert('Analysis failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            } finally {
+                loadingSpinner.style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        }
+        
+        // Display results
+        function displayResult(result) {
+            currentEmotion = result;
+            
+            // Update emotion display
+            document.getElementById('emotionEmoji').textContent = result.emoji;
+            document.getElementById('emotionName').textContent = result.predicted_emotion;
+            
+            const confidence = Math.round(result.confidence * 100);
+            document.getElementById('confidenceBar').style.width = confidence + '%';
+            document.getElementById('confidenceText').textContent = `Confidence: ${confidence}%`;
+            
+            // Create probability chart
+            createProbabilityChart(result.all_probabilities);
+            
+            // Show AI response
+            document.getElementById('aiResponse').innerHTML = `
+                <strong><i class="fas fa-robot"></i> AI Assistant:</strong><br>
+                ${result.text_response}
+            `;
+            
+            // Show result container
+            resultContainer.style.display = 'block';
+        }
+        
+        // Create probability chart
+        function createProbabilityChart(probabilities) {
+            const emotions = Object.keys(probabilities);
+            const values = Object.values(probabilities);
+            
+            const data = [{
+                x: emotions,
+                y: values,
+                type: 'bar',
+                marker: {
+                    color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA726', '#66BB6A', '#AB47BC', '#FF7043']
+                }
+            }];
+            
+            const layout = {
+                title: 'Emotion Probability Distribution',
+                xaxis: { title: 'Emotion Categories' },
+                yaxis: { title: 'Probability', range: [0, 1] },
+                font: { size: 12 }
+            };
+            
+            Plotly.newPlot('probabilityChart', data, layout, {responsive: true});
+        }
+        
+        // Webcam functionality
+        document.getElementById('startWebcamBtn').addEventListener('click', startWebcam);
+        document.getElementById('stopWebcamBtn').addEventListener('click', stopWebcam);
+        document.getElementById('captureBtn').addEventListener('click', captureAndAnalyze);
+        
+        async function startWebcam() {
+            try {
+                webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('webcam');
+                video.srcObject = webcamStream;
+                video.style.display = 'block';
+                
+                document.getElementById('startWebcamBtn').disabled = true;
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('stopWebcamBtn').disabled = false;
+            } catch (error) {
+                alert('Unable to access webcam: ' + error.message);
+            }
+        }
+        
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+                
+                document.getElementById('webcam').style.display = 'none';
+                document.getElementById('startWebcamBtn').disabled = false;
+                document.getElementById('captureBtn').disabled = true;
+                document.getElementById('stopWebcamBtn').disabled = true;
+            }
+        }
+        
+        async function captureAndAnalyze() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('webcamCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Draw current video frame on canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert to blob and send to API
+            canvas.toBlob(async function(blob) {
+                const formData = new FormData();
+                formData.append('image', blob, 'webcam_capture.jpg');
+                
+                try {
+                    const response = await fetch('/api/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        displayWebcamResult(result);
+                    } else {
+                        alert('Analysis failed: ' + result.error);
+                    }
+                } catch (error) {
+                    alert('Network error: ' + error.message);
+                }
+            }, 'image/jpeg');
+        }
+        
+        function displayWebcamResult(result) {
+            const webcamResult = document.getElementById('webcamResult');
+            webcamResult.innerHTML = `
+                <div class="emotion-result">
+                    <div class="emotion-emoji">${result.emoji}</div>
+                    <h3>${result.predicted_emotion}</h3>
+                    <p>Confidence: ${Math.round(result.confidence * 100)}%</p>
+                    <div class="mt-3">
+                        <strong>AI Response:</strong><br>
+                        ${result.text_response}
+                    </div>
+                </div>
+            `;
+            webcamResult.style.display = 'block';
+        }
+        
+        // Chat functionality
+        document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message || !currentEmotion) return;
+            
+            // Show user message
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML += `
+                <div class="chat-message user">
+                    <strong>You:</strong> ${message}
+                </div>
+            `;
+            
+            chatInput.value = '';
+            
+            try {
+                const response = await fetch('/api/generate_text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        emotion: currentEmotion.predicted_emotion,
+                        user_input: message,
+                        confidence: currentEmotion.confidence || 0.8
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Show AI response
+                    chatContainer.innerHTML += `
+                        <div class="chat-message bot">
+                            <strong><i class="fas fa-robot"></i> AI:</strong> ${result.text_response}
+                        </div>
+                    `;
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                } else {
+                    alert('Response generation failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        // Batch processing functionality
+        document.getElementById('batchUploadArea').addEventListener('click', () => {
+            document.getElementById('batchImageInput').click();
+        });
+        
+        document.getElementById('batchImageInput').addEventListener('change', handleBatchFiles);
+        
+        async function handleBatchFiles(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('images', file);
+            });
+            
+            // Show progress bar
+            const progressContainer = document.getElementById('batchProgress');
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            try {
+                const response = await fetch('/api/batch_predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayBatchResults(result.results);
+                } else {
+                    alert('Batch processing failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            } finally {
+                progressContainer.style.display = 'none';
+            }
+        }
+        
+        function displayBatchResults(results) {
+            const container = document.getElementById('batchResults');
+            container.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">${result.filename}</h5>
+                            <div class="emotion-emoji" style="font-size: 2rem;">${result.emoji}</div>
+                            <p class="card-text">
+                                <strong>${result.predicted_emotion}</strong><br>
+                                Confidence: ${Math.round(result.confidence * 100)}%
+                            </p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Get model information after page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/model_info');
+                const info = await response.json();
+                console.log('Model info:', info);
+            } catch (error) {
+                console.log('Failed to get model info:', error);
+            }
+        });
+    </script>
+</body>
+</html>

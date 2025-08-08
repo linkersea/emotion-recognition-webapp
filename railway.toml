@@ -1,0 +1,12 @@
+# Railway部署配置文件
+[build]
+  builder = "NIXPACKS"
+
+[deploy]
+  startCommand = "python web/backend/app.py"
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyMaxRetries = 10
+
+[env]
+  PORT = "8080"
+  PYTHONPATH = "/app:/app/src"

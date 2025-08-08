@@ -1,0 +1,80 @@
+api:
+  # 主要API配置 - 推荐使用硅基流动，价格便宜稳定
+  provider: "siliconflow"  # 选项: "siliconflow", "deepseek"
+  
+  # 硅基流动 API (强烈推荐 - 价格便宜，稳定性好)
+  siliconflow:
+    api_key: "sk-uxsiqasafikwfctaebknfpsfrvbnyyaxclygouotdjddnbyq"  # 在这里填入你的硅基流动API密钥 - 去 https://siliconflow.cn 注册
+    base_url: "https://api.siliconflow.cn/v1/chat/completions"
+    model: "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"  # 免费模型
+    max_tokens: 200
+    temperature: 0.7
+    
+  # DeepSeek API (备用)
+  deepseek:
+    api_key: "sk-5de60e24de9f45f9ba529886982d8ad4"
+    base_url: "https://api.deepseek.com/chat/completions"
+    model: "deepseek-chat"
+    max_tokens: 200
+    temperature: 0.7
+augmentation:
+  brightness_range:
+  - 0.8
+  - 1.2
+  contrast_range:
+  - 0.8
+  - 1.2
+  gaussian_noise: 0.1
+  horizontal_flip: true
+  rotation_range: 15
+data:
+  batch_size: 64
+  image_size: 48
+  num_workers: 4
+  test_path: archive/test
+  train_path: archive/train
+  validation_split: 0.2
+emotion_colors:
+  angry: '#FF4444'
+  disgust: '#44FF44'
+  fear: '#4444FF'
+  happy: '#FFFF44'
+  neutral: '#888888'
+  sad: '#44FFFF'
+  surprise: '#FF44FF'
+emotion_emojis:
+  angry: 😠
+  disgust: 🤢
+  fear: 😨
+  happy: 😊
+  neutral: 😐
+  sad: 😢
+  surprise: 😲
+emotion_labels:
+  0: angry
+  1: disgust
+  2: fear
+  3: happy
+  4: neutral
+  5: sad
+  6: surprise
+model:
+  architecture: custom_cnn
+  dropout_rate: 0.5
+  name: CustomCNN
+  num_classes: 7
+  pretrained: true
+  use_cbam: false
+training:
+  device: auto
+  early_stopping_patience: 25
+  epochs: 120
+  gamma: 0.3
+  learning_rate: 0.001
+  scheduler: StepLR
+  step_size: 50
+  weight_decay: 0.0001
+web:
+  debug: true
+  host: 0.0.0.0
+  port: 5000
