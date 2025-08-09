@@ -16,15 +16,15 @@ class EmotionTextGenerator:
     
     def __init__(self, config: Dict):
         """
-        初始化文本生成器
+        Initialize text generator
         
         Args:
-            config: 配置字典，包含API配置等信息
+            config: Configuration dictionary containing API settings and other information
         """
         self.config = config
         self.api_config = config.get('api', {})
         
-        # 确定使用的API提供商
+        # Determine which API provider to use
         self.provider = self.api_config.get('provider', 'deepseek')
         self.current_api_config = self.api_config.get(self.provider, {})
         
@@ -120,9 +120,9 @@ class EmotionTextGenerator:
             if ai_response:
                 return ai_response
         except Exception as e:
-            print(f"AI回应生成失败，使用智能离线模式: {e}")
+            print(f"AI response generation failed, using intelligent offline mode: {e}")
         
-        # 使用智能离线回应
+        # Use intelligent offline response
         return self._generate_offline_response(emotion, confidence, emotion_pattern)
     
     def _add_to_history(self, emotion: str, confidence: float):
@@ -134,7 +134,7 @@ class EmotionTextGenerator:
             'timestamp': timestamp
         })
         
-        # 保持历史记录在合理长度
+        # Keep history at reasonable length
         if len(self.emotion_history) > self.max_history:
             self.emotion_history.pop(0)
     
@@ -150,12 +150,12 @@ class EmotionTextGenerator:
         negative_emotions = ['sad', 'angry', 'fear', 'disgust']
         
         if len(recent_emotions) >= 2:
-            # 从负面转向正面 = 改善
+            # From negative to positive = improvement
             if (recent_emotions[-2] in negative_emotions and 
                 recent_emotions[-1] in positive_emotions):
                 return "improving"
             
-            # 从正面转向负面 = 下降  
+            # From positive to negative = decline  
             elif (recent_emotions[-2] in positive_emotions and 
                   recent_emotions[-1] in negative_emotions):
                 return "declining"
@@ -178,21 +178,21 @@ class EmotionTextGenerator:
             try:
                 return self._generate_with_api(emotion, confidence, context)
             except Exception as e:
-                # 如果是402错误（配额用完）或其他API错误，静默使用备用回应
+                # If 402 error (quota exhausted) or other API errors, silently use backup responses
                 error_msg = str(e).lower()
                 if '402' in error_msg or 'payment' in error_msg or 'quota' in error_msg:
-                    print(f"💡 API配额已用完，切换到离线智能模式")
+                    print(f"💡 API quota exhausted, switching to offline intelligent mode")
                 elif 'not found' in error_msg or '404' in error_msg:
-                    print(f"🔧 API端点错误，切换到离线智能模式")
+                    print(f"🔧 API endpoint error, switching to offline intelligent mode")
                 else:
-                    print(f"🔄 API暂时不可用，使用离线智能模式: {e}")
+                    print(f"🔄 API temporarily unavailable, using offline intelligent mode: {e}")
                 
                 return self._get_smart_fallback_response(emotion, confidence)
         else:
             return self._get_smart_fallback_response(emotion, confidence)
     
     def _record_emotion(self, emotion: str, confidence: float):
-        """记录情绪历史用于上下文感知"""
+        """Record emotion history for context awareness"""
         current_record = {
             'emotion': emotion,
             'confidence': confidence,
@@ -201,14 +201,14 @@ class EmotionTextGenerator:
         
         self.emotion_history.append(current_record)
         
-        # 保持历史记录在合理范围内
+        # Keep history within reasonable range
         if len(self.emotion_history) > self.max_history:
             self.emotion_history = self.emotion_history[-self.max_history:]
     
     def _generate_with_api(self, emotion: str, confidence: float, context: Dict = None) -> str:
-        """使用API生成专业情绪抚慰回应"""
+        """Use API to generate professional emotional comfort responses"""
         
-        # 智能构建提示词
+        # Intelligently build prompts
         prompt = self._build_intelligent_prompt(emotion, confidence, context)
         
         headers = {
@@ -229,43 +229,43 @@ class EmotionTextGenerator:
             'stream': False
         }
         
-        print(f"🌐 正在调用{self.provider} API...")
+        print(f"🌐 Calling {self.provider} API...")
         print(f"📡 URL: {self.base_url}")
         
-        # 添加重试机制和更长的超时时间
-        for attempt in range(2):  # 最多重试2次
+        # Add retry mechanism and longer timeout
+        for attempt in range(2):  # Retry up to 2 times
             try:
                 response = requests.post(
                     self.base_url,
                     headers=headers,
                     json=data,
-                    timeout=30  # 增加超时时间到30秒
+                    timeout=30  # Increase timeout to 30 seconds
                 )
                 break
             except requests.exceptions.Timeout as e:
                 if attempt == 0:
-                    print(f"⏰ 第{attempt+1}次超时，重试中...")
+                    print(f"⏰ Attempt {attempt+1} timed out, retrying...")
                     time.sleep(2)  # Wait 2 seconds before retry
                 else:
                     raise e
         
-        print(f"📊 API响应状态: {response.status_code}")
+        print(f"📊 API response status: {response.status_code}")
         
         if response.status_code == 200:
             result = response.json()
             generated_text = result['choices'][0]['message']['content'].strip()
             
-            # 智能后处理：确保回应自然友好
+            # Intelligent post-processing: ensure responses are natural and friendly
             return self._post_process_response(generated_text, emotion)
         else:
-            # 输出详细的错误信息用于调试
+            # Output detailed error information for debugging
             try:
                 error_detail = response.json()
-                print(f"❌ API错误详情: {error_detail}")
+                print(f"❌ API error details: {error_detail}")
             except:
-                print(f"❌ API响应内容: {response.text}")
+                print(f"❌ API response content: {response.text}")
             
-            raise Exception(f"API请求失败: {response.status_code}")
+            raise Exception(f"API request failed: {response.status_code}")
     
     def _build_intelligent_prompt(self, emotion: str, confidence: float, context: Dict = None) -> str:
         """Intelligently build API request prompts - Focus on emotional comfort"""
@@ -385,15 +385,15 @@ Please provide a natural and friendly response directly, no more than 40 words.
         """Generate intelligent offline responses, considering emotion patterns and history"""
         # Get basic responses
         responses = self.fallback_responses.get(emotion, [
-            "我能感受到你现在的情绪，想要聊聊吗？"
+            "I can sense your current emotions. Would you like to talk about it?"
         ])
         
         # Adjust response strategy based on emotion patterns and context
         if emotion_pattern == "improving" and emotion in ['happy', 'neutral']:
-            # 情绪在好转，给予积极反馈
+            # Emotions are improving, provide positive feedback
             positive_responses = {
-                'happy': "太棒了！看到你情绪越来越好，我也替你开心！",
-                'neutral': "感觉你心情在慢慢好转，这很不错呢～"
+                'happy': "That's wonderful! Seeing your mood getting better makes me happy too!",
+                'neutral': "It feels like your mood is slowly improving. That's really nice~"
             }
             return positive_responses.get(emotion, responses[0])
         
@@ -415,7 +415,7 @@ Please provide a natural and friendly response directly, no more than 40 words.
             }
             return caring_responses.get(emotion, "It looks like things have been tough lately. Remember to take care of yourself.")
         
-        # 根据置信度选择合适的回应风格
+        # Choose appropriate response style based on confidence level
         if confidence > 0.85:
             # High confidence: more direct, confident responses
             return responses[0] if responses else "I can clearly see your emotions from your expression!"
