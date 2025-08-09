@@ -32,81 +32,81 @@ class EmotionTextGenerator:
         self.base_url = self.current_api_config.get('base_url', '')
         self.model = self.current_api_config.get('model', 'deepseek-chat')
         
-        # 用户情绪历史记录（用于上下文感知）
+        # User emotion history for context awareness
         self.emotion_history = []
-        self.max_history = 5  # 最多记录5次情绪
+        self.max_history = 5  # Record up to 5 emotions
         
-        # 智能离线回应库（更自然的朋友式回应）
+        # Intelligent offline response library (natural friend-like responses)
         self.fallback_responses = {
             'angry': [
-                "看得出你很生气，想发泄一下吗？我在这里听着。",
-                "遇到糟心事了？深呼吸一下，咱们慢慢聊。",
-                "愤怒是正常的，别憋着，说出来会好些。",
-                "感受到你的火气了，什么事让你这么upset？",
-                "生气的时候记得照顾好自己，我陪着你。"
+                "I can see you're angry. Want to vent? I'm here to listen.",
+                "Having a rough time? Take a deep breath, let's talk it through.",
+                "Anger is normal. Don't hold it in, expressing it helps.",
+                "I can feel your frustration. What's got you so upset?",
+                "Remember to take care of yourself when you're angry. I'm here with you."
             ],
             'disgust': [
-                "看起来遇到什么恶心的事了？要不咱换个话题？",
-                "这种感觉我懂，有时候确实会遇到让人反感的事。",
-                "不舒服的感觉总会过去的，想听点轻松的吗？",
-                "直觉告诉你远离不好的东西，这很正常。",
-                "我理解这种感受，需要转移一下注意力吗？"
+                "Looks like something really bothered you. Want to change the topic?",
+                "I understand that feeling. Sometimes we encounter truly repulsive things.",
+                "Uncomfortable feelings will pass. Want to hear something light?",
+                "Your instincts are telling you to avoid bad things. That's normal.",
+                "I understand this feeling. Need a distraction?"
             ],
             'fear': [
-                "感到害怕很正常，记住我一直在这里陪着你。",
-                "恐惧让我们更小心，这其实是在保护自己。",
-                "勇敢不是不害怕，而是害怕了还能继续前行。",
-                "想聊聊让你担心的事吗？说出来可能会轻松些。",
-                "深呼吸，告诉自己：这些我都能应对。"
+                "Feeling scared is normal. Remember, I'm always here with you.",
+                "Fear makes us more careful. It's actually protecting us.",
+                "Courage isn't about not being afraid, it's moving forward despite fear.",
+                "Want to talk about what's worrying you? It might help to share.",
+                "Take a deep breath and tell yourself: I can handle this."
             ],
             'happy': [
-                "你的笑容真有感染力！什么好事让你这么开心？",
-                "看到你这么高兴我也很开心！分享一下呗～",
-                "快乐就是要传染给更多人，继续保持！",
-                "这个笑容太治愈了，多笑笑对身体好！",
-                "开心的时光值得好好珍惜，愿你一直这么快乐！"
+                "Your smile is so contagious! What good news made you so happy?",
+                "Seeing you this happy makes me happy too! Care to share?",
+                "Happiness should spread to more people. Keep it up!",
+                "That smile is so healing! Smiling is good for your health!",
+                "Happy moments are worth treasuring. May you always be this joyful!"
             ],
             'neutral': [
-                "平静的状态也很棒，内心安宁是种福气。",
-                "看起来今天心情不错，想聊聊最近怎么样吗？",
-                "有时候就需要这样安静的时刻，享受当下。",
-                "平和的表情很有魅力，想分享下今天的心情吗？",
-                "在忙碌中保持冷静，这是很了不起的能力。"
+                "A calm state is wonderful too. Inner peace is a blessing.",
+                "You seem to be in a good mood today. How have things been lately?",
+                "Sometimes we need quiet moments like this. Enjoy the present.",
+                "Your peaceful expression is quite charming. Want to share how you're feeling today?",
+                "Staying calm amid busyness is a remarkable ability."
             ],
             'sad': [
-                "看到你难过，真想给你一个温暖的拥抱。",
-                "悲伤就像雨天，总会过去的，阳光还会再来。",
-                "想哭就哭吧，释放情感对心理健康有好处。",
-                "你不是一个人在承受，有什么想说的吗？",
-                "难过的时候记住，总有人在默默关心着你。"
+                "Seeing you sad makes me want to give you a warm hug.",
+                "Sadness is like a rainy day - it will pass, and the sun will shine again.",
+                "It's okay to cry. Releasing emotions is good for mental health.",
+                "You're not bearing this alone. Is there anything you'd like to talk about?",
+                "When you're sad, remember there are always people who care about you."
             ],
             'surprise': [
-                "哇！什么事让你这么惊讶？看起来很有趣！",
-                "这个表情太可爱了！一定遇到什么意外惊喜了？",
-                "保持这份好奇心，生活会更加精彩有趣！",
-                "惊喜总是让人印象深刻，愿意分享一下吗？",
-                "意外之喜最珍贵，你的表情告诉我一定很棒！"
+                "Wow! What surprised you so much? It looks interesting!",
+                "That expression is so cute! Must have encountered some unexpected surprise?",
+                "Keep that curiosity - it makes life more exciting and interesting!",
+                "Surprises are always memorable. Care to share?",
+                "Unexpected joys are the most precious. Your expression tells me it must be wonderful!"
             ]
         }
         
-        print(f"✅ 智能情绪响应生成器初始化完成")
-        print(f"🔧 API提供商: {self.provider}")
+        print(f"✅ Intelligent Emotion Response Generator initialized successfully")
+        print(f"🔧 API Provider: {self.provider}")
         if self.api_key:
-            print(f"🔑 API已配置 - 使用{self.provider}进行AI情绪抚慰")
+            print(f"🔑 API configured - Using {self.provider} for AI emotional support")
         else:
-            print(f"🧠 使用离线智能模式 - 精心设计的情绪感知回应")
+            print(f"🧠 Using offline intelligent mode - Carefully designed emotion-aware responses")
     
     def generate_response(self, emotion: str, confidence: float = 0.0, context: Dict = None) -> str:
         """
-        智能生成情绪相关的回应文本 - 优先使用AI API进行专业情绪抚慰
+        Intelligently generate emotion-related response text - Prioritize AI API for professional emotional support
         
         Args:
-            emotion: 检测到的情绪类型
-            confidence: 置信度 (0.0-1.0)
-            context: 附加上下文信息（可选）
+            emotion: Detected emotion type
+            confidence: Confidence level (0.0-1.0)
+            context: Additional context information (optional)
             
         Returns:
-            情绪相关的回应文本
+            Emotion-related response text
         """
         # 记录当前情绪到历史中
         self._add_to_history(emotion, confidence)
@@ -268,115 +268,115 @@ class EmotionTextGenerator:
             raise Exception(f"API请求失败: {response.status_code}")
     
     def _build_intelligent_prompt(self, emotion: str, confidence: float, context: Dict = None) -> str:
-        """智能构建API请求的提示词 - 专注于情绪抚慰"""
+        """Intelligently build API request prompts - Focus on emotional comfort"""
         
         emotion_descriptions = {
-            'angry': '愤怒/生气',
-            'disgust': '厌恶/恶心', 
-            'fear': '恐惧/害怕',
-            'happy': '开心/快乐',
-            'neutral': '平静/中性',
-            'sad': '悲伤/难过',
-            'surprise': '惊讶/意外'
+            'angry': 'angry/furious',
+            'disgust': 'disgusted/repulsed', 
+            'fear': 'fearful/scared',
+            'happy': 'happy/joyful',
+            'neutral': 'calm/neutral',
+            'sad': 'sad/melancholy',
+            'surprise': 'surprised/amazed'
         }
         
-        # 智能置信度分析
+        # Intelligent confidence analysis
         if confidence > 0.8:
-            confidence_level = "非常确定"
+            confidence_level = "very confident"
         elif confidence > 0.6:
-            confidence_level = "比较确定"
+            confidence_level = "fairly confident"
         else:
-            confidence_level = "不太确定"
+            confidence_level = "not very confident"
         
-        emotion_cn = emotion_descriptions.get(emotion, emotion)
+        emotion_desc = emotion_descriptions.get(emotion, emotion)
         
-        # 获取用户补充说明
+        # Get user's additional context
         user_context = ""
         if context and context.get('user_input'):
-            user_context = f"用户补充说明：「{context['user_input']}」"
+            user_context = f"User's additional note: \"{context['user_input']}\""
         
-        # 分析情绪历史模式
+        # Analyze emotion history patterns
         recent_emotions = [h['emotion'] for h in self.emotion_history[-3:]]
         emotion_pattern = self._analyze_emotion_pattern()
         
-        # 根据不同情绪专门设计提示词，让回应更自然有温度
+        # Design specific prompts for different emotions to make responses more natural and warm
         if emotion in ['happy', 'surprise']:
-            # 积极情绪处理 - 自然分享喜悦
-            context_hint = "用户情绪积极，" if emotion_pattern != "improving" else "用户情绪在好转，"
+            # Positive emotion handling - naturally share joy
+            context_hint = "User's emotion is positive, " if emotion_pattern != "improving" else "User's emotion is improving, "
                 
             prompt = f"""
-你是一个温暖贴心的朋友。用户刚刚通过表情识别显示出"{emotion_cn}"的情绪，你能感受到他们的开心。
+You are a warm and caring friend. The user just showed "{emotion_desc}" emotion through facial recognition, and you can feel their happiness.
 {user_context}
 
-请像一个真正关心他们的朋友一样回应：
-- 自然地表达你也为他们感到高兴
-- 如果有补充说明，要真诚地回应具体内容
-- 用轻松愉快的语气，可以带点幽默感
-- 避免过于正式或教条式的语言
-- 回应要有温度，像朋友间的真实对话
+Please respond like a genuine friend who truly cares about them:
+- Naturally express that you're also happy for them
+- If there's additional context, respond sincerely to the specific content
+- Use a light and cheerful tone, can include some humor
+- Avoid overly formal or preachy language
+- The response should be warm, like a real conversation between friends
 
-请直接给出自然的回应，不超过40字。
+Please provide a natural response directly, no more than 40 words.
 """
         elif emotion in ['sad', 'fear']:
-            # 负面情绪处理 - 真诚陪伴安慰
-            context_hint = "用户情绪低落，" if emotion_pattern != "declining" else "用户情绪持续低落，"
+            # Negative emotion handling - sincere companionship and comfort
+            context_hint = "User's emotion is low, " if emotion_pattern != "declining" else "User's emotion continues to be low, "
                 
             prompt = f"""
-你是一个善解人意的知心朋友。用户通过表情识别显示出"{emotion_cn}"的情绪，你能感受到他们内心的不安或难过。
+You are an understanding and caring close friend. The user shows "{emotion_desc}" emotion through facial recognition, and you can feel their unease or sadness.
 {user_context}
 
-请像一个真正在乎他们的朋友一样给予安慰：
-- 用最真诚的语言表达你的理解和关心
-- 如果有补充说明，要针对具体情况给予贴心回应
-- 语气要温暖而不是冷冰冰的建议
-- 让他们感受到真正的陪伴和支持
-- 可以轻柔地询问但不要给压力
+Please comfort them like a friend who truly cares:
+- Use the most sincere language to express your understanding and care
+- If there's additional context, provide thoughtful responses to specific situations
+- The tone should be warm rather than cold advice
+- Let them feel genuine companionship and support
+- You can gently inquire but don't pressure them
 
-请直接给出温暖的回应，不超过40字。
+Please provide a warm response directly, no more than 40 words.
 """
         elif emotion == 'angry':
-            # 愤怒情绪处理 - 理解和支持
+            # Anger emotion handling - understanding and support
             prompt = f"""
-你是一个理解包容的好朋友。用户通过表情显示出"{emotion_cn}"的情绪，你能感受到他们的愤怒或挫败。
+You are an understanding and tolerant good friend. The user shows "{emotion_desc}" emotion through facial expression, and you can feel their anger or frustration.
 {user_context}
 
-请像一个真正理解他们的朋友一样回应：
-- 首先表达你能理解他们的感受
-- 如果有补充说明，要针对具体情况表示理解
-- 用平静而有力的语气给予支持
-- 避免说教，而是站在他们一边
-- 可以轻松地建议发泄方式
+Please respond like a friend who truly understands them:
+- First express that you can understand their feelings
+- If there's additional context, show understanding for the specific situation
+- Use a calm but supportive tone
+- Avoid lecturing, instead stand by their side
+- You can casually suggest ways to vent
 
-请直接给出理解支持的回应，不超过40字。
+Please provide an understanding and supportive response directly, no more than 40 words.
 """
         elif emotion == 'disgust':
-            # 厌恶情绪处理 - 共情理解
+            # Disgust emotion handling - empathetic understanding
             prompt = f"""
-你是一个善于共情的朋友。用户通过表情显示出"{emotion_cn}"的情绪，可能遇到了让人反感的事情。
+You are an empathetic friend. The user shows "{emotion_desc}" emotion through facial expression, possibly encountering something repulsive.
 {user_context}
 
-请像一个真正理解他们的朋友一样回应：
-- 表达你能理解这种感受
-- 如果有补充说明，要针对具体情况表示认同
-- 用轻松的语气帮助转移注意力
-- 避免深究细节，而是给予理解和支持
+Please respond like a friend who truly understands them:
+- Express that you can understand this feeling
+- If there's additional context, show agreement with the specific situation
+- Use a light tone to help redirect attention
+- Avoid dwelling on details, instead give understanding and support
 
-请直接给出理解包容的回应，不超过40字。
+Please provide an understanding and tolerant response directly, no more than 40 words.
 """
-        else:  # neutral 或其他
-            # 中性情绪处理 - 自然陪伴
+        else:  # neutral or others
+            # Neutral emotion handling - natural companionship
             prompt = f"""
-你是一个温和的朋友。用户通过表情显示出"{emotion_cn}"的状态，看起来比较平静。
+You are a gentle friend. The user shows "{emotion_desc}" state through facial expression, appearing quite calm.
 {user_context}
 
-请像一个自然的朋友一样与他们交流：
-- 认可他们当前的状态
-- 如果有补充说明，要自然地回应
-- 用轻松友好的语气
-- 可以随意聊聊，不要太正式
-- 创造轻松的氛围
+Please interact with them like a natural friend:
+- Acknowledge their current state
+- If there's additional context, respond naturally
+- Use a relaxed and friendly tone
+- You can chat casually, don't be too formal
+- Create a relaxed atmosphere
 
-请直接给出自然友好的回应，不超过40字。
+Please provide a natural and friendly response directly, no more than 40 words.
 """
         
         return prompt
@@ -417,37 +417,37 @@ class EmotionTextGenerator:
         
         # 根据置信度选择合适的回应风格
         if confidence > 0.85:
-            # 高置信度：更直接、确定的回应
-            return responses[0] if responses else "从你的表情能看出很明确的情绪呢！"
+            # High confidence: more direct, confident responses
+            return responses[0] if responses else "I can clearly see your emotions from your expression!"
         elif confidence > 0.65:
-            # 中等置信度：平衡自然的回应
+            # Medium confidence: balanced natural responses
             mid_idx = len(responses) // 2
-            return responses[mid_idx] if responses else "能感受到你现在的心情变化。"
+            return responses[mid_idx] if responses else "I can sense your current mood."
         else:
-            # 低置信度：更温和、探索性的回应
+            # Low confidence: gentler, exploratory responses
             gentle_responses = {
-                'happy': "似乎心情不错？不管怎样，看到你我就很开心～",
-                'sad': "感觉可能有点不开心？如果想聊聊，我随时在这里。",
-                'angry': "似乎有些情绪波动，要不要说说是什么事？",
-                'neutral': "看起来还挺平静的，今天过得怎么样？",
-                'fear': "感觉有点不安？别担心，有什么事我们一起解决。",
-                'disgust': "看起来可能遇到了不太愉快的事？",
-                'surprise': "好像有什么让你觉得意外的事？"
+                'happy': "You seem to be in a good mood? Either way, seeing you makes me happy~",
+                'sad': "Feeling a bit down perhaps? If you want to talk, I'm always here.",
+                'angry': "Seems like there might be some emotional turbulence. Want to talk about what's bothering you?",
+                'neutral': "You look quite calm. How was your day?",
+                'fear': "Feeling a bit uneasy? Don't worry, we can work through whatever it is together.",
+                'disgust': "Looks like you might have encountered something unpleasant?",
+                'surprise': "Something unexpected happen?"
             }
-            return gentle_responses.get(emotion, "不管你现在什么感受，我都在这里陪着你。")
+            return gentle_responses.get(emotion, "Whatever you're feeling right now, I'm here with you.")
     
     def _post_process_response(self, generated_text: str, emotion: str) -> str:
-        """智能后处理生成的回应"""
-        # 移除不必要的标点和格式
+        """Intelligently post-process generated responses"""
+        # Remove unnecessary punctuation and formatting
         text = generated_text.strip()
         
-        # 移除可能的引号
+        # Remove possible quotes
         if text.startswith('"') and text.endswith('"'):
             text = text[1:-1]
         
-        # 确保长度合适
+        # Ensure appropriate length
         if len(text) > 40:
-            # 如果太长，尝试找到合适的截断点
+            # If too long, try to find a suitable truncation point
             sentences = text.split('。')
             if len(sentences) > 1 and len(sentences[0]) <= 35:
                 text = sentences[0] + '。'
@@ -468,32 +468,32 @@ class EmotionTextGenerator:
     def _get_smart_fallback_response(self, emotion: str, confidence: float) -> str:
         """获取智能离线回应 - 根据置信度、历史和上下文智能调整"""
         responses = self.fallback_responses.get(emotion, [
-            "我理解你现在的感受，有什么想分享的吗？"
+            "I understand how you're feeling right now. Is there anything you'd like to share?"
         ])
         
-        # 分析情绪历史模式，提供上下文感知的回应
+        # Analyze emotion history patterns for context-aware responses
         recent_emotions = [h['emotion'] for h in self.emotion_history[-3:]]
         emotion_pattern = self._analyze_emotion_pattern()
         
-        # 根据情绪模式和上下文调整回应策略
+        # Adjust response strategy based on emotion patterns and context
         if emotion_pattern == "improving" and emotion in ['happy', 'neutral']:
-            # 情绪在好转，给予积极反馈
+            # Emotions are improving, provide positive feedback
             positive_responses = {
-                'happy': "太棒了！看到你情绪越来越好，我也替你开心！",
-                'neutral': "感觉你心情在慢慢好转，这很不错呢～"
+                'happy': "That's wonderful! Seeing your mood getting better makes me happy too!",
+                'neutral': "It feels like your mood is slowly improving. That's really nice~"
             }
             return positive_responses.get(emotion, responses[0])
         
         elif emotion_pattern == "declining" and emotion in ['sad', 'angry', 'fear']:
-            # 情绪在下降，提供更多温暖关怀
+            # Emotions are declining, provide more warm care
             supportive_responses = {
-                'sad': "最近情绪有些低落呢，要不要和我聊聊？我会一直陪着你。",
-                'angry': "看起来最近有些事情让你很烦心，深呼吸一下，咱们一起面对。",
-                'fear': "感受到你内心的不安，别怕，有什么事我们一起想办法。"
+                'sad': "Your mood seems a bit low lately. Want to talk with me? I'll always be here with you.",
+                'angry': "Looks like some things have been bothering you lately. Take a deep breath, let's face it together.",
+                'fear': "I can sense your inner unease. Don't be afraid, we can figure out whatever it is together."
             }
             return supportive_responses.get(emotion, responses[-1])
         
-        # 根据置信度选择合适的回应风格
+        # Choose appropriate response style based on confidence level
         if confidence > 0.85:
             # 高置信度：更直接、确定的回应
             return responses[0] if responses else "从你的表情能看出很明确的情绪呢！"
