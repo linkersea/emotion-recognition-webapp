@@ -1,5 +1,5 @@
 """
-基于多API的智能情绪响应文本生成器 - 支持DeepSeek等多种API
+Multi-API intelligent emotion response text generator - supports DeepSeek and other APIs
 """
 
 import os
@@ -12,7 +12,7 @@ from datetime import datetime
 
 
 class EmotionTextGenerator:
-    """智能情绪文本生成器 - 支持多种API，自动切换"""
+    """Intelligent emotion text generator - supports multiple APIs with automatic switching"""
     
     def __init__(self, config: Dict):
         """
@@ -108,14 +108,14 @@ class EmotionTextGenerator:
         Returns:
             Emotion-related response text
         """
-        # 记录当前情绪到历史中
+        # Record current emotion to history
         self._add_to_history(emotion, confidence)
         
-        # 分析情绪模式
+        # Analyze emotion patterns
         emotion_pattern = self._analyze_emotion_pattern()
         
         try:
-            # 尝试使用AI API生成个性化回应
+            # Try to use AI API to generate personalized responses
             ai_response = self._generate_ai_response(emotion, confidence, context, emotion_pattern)
             if ai_response:
                 return ai_response
@@ -126,7 +126,7 @@ class EmotionTextGenerator:
         return self._generate_offline_response(emotion, confidence, emotion_pattern)
     
     def _add_to_history(self, emotion: str, confidence: float):
-        """添加情绪记录到历史中"""
+        """Add emotion record to history"""
         timestamp = datetime.now()
         self.emotion_history.append({
             'emotion': emotion,
@@ -139,13 +139,13 @@ class EmotionTextGenerator:
             self.emotion_history.pop(0)
     
     def _analyze_emotion_pattern(self) -> str:
-        """分析近期情绪变化模式"""
+        """Analyze recent emotion change patterns"""
         if len(self.emotion_history) < 2:
             return "stable"
         
         recent_emotions = [record['emotion'] for record in self.emotion_history[-3:]]
         
-        # 检查情绪改善模式
+        # Check emotion improvement patterns
         positive_emotions = ['happy', 'surprise', 'neutral']
         negative_emotions = ['sad', 'angry', 'fear', 'disgust']
         
@@ -160,11 +160,11 @@ class EmotionTextGenerator:
                   recent_emotions[-1] in negative_emotions):
                 return "declining"
             
-            # 持续负面情绪 = 需要特别关怀
+            # Persistent negative emotions = need special care
             elif all(e in negative_emotions for e in recent_emotions[-2:]):
                 return "concerning"
             
-            # 持续正面情绪 = 状态良好
+            # Persistent positive emotions = good state
             elif all(e in positive_emotions for e in recent_emotions[-2:]):
                 return "positive"
         
@@ -173,7 +173,7 @@ class EmotionTextGenerator:
     def _generate_ai_response(self, emotion: str, confidence: float, context: Dict, emotion_pattern: str) -> Optional[str]:
         self._record_emotion(emotion, confidence)
         
-        # 优先使用AI API来提供真正的情绪抚慰
+        # Prioritize using AI API to provide genuine emotional comfort
         if self.api_key:
             try:
                 return self._generate_with_api(emotion, confidence, context)
@@ -245,7 +245,7 @@ class EmotionTextGenerator:
             except requests.exceptions.Timeout as e:
                 if attempt == 0:
                     print(f"⏰ 第{attempt+1}次超时，重试中...")
-                    time.sleep(2)  # 等待2秒后重试
+                    time.sleep(2)  # Wait 2 seconds before retry
                 else:
                     raise e
         
@@ -382,13 +382,13 @@ Please provide a natural and friendly response directly, no more than 40 words.
         return prompt
     
     def _generate_offline_response(self, emotion: str, confidence: float, emotion_pattern: str) -> str:
-        """生成智能离线回应，考虑情绪模式和历史"""
-        # 获取基础回应
+        """Generate intelligent offline responses, considering emotion patterns and history"""
+        # Get basic responses
         responses = self.fallback_responses.get(emotion, [
             "我能感受到你现在的情绪，想要聊聊吗？"
         ])
         
-        # 根据情绪模式和上下文调整回应策略
+        # Adjust response strategy based on emotion patterns and context
         if emotion_pattern == "improving" and emotion in ['happy', 'neutral']:
             # 情绪在好转，给予积极反馈
             positive_responses = {
@@ -398,22 +398,22 @@ Please provide a natural and friendly response directly, no more than 40 words.
             return positive_responses.get(emotion, responses[0])
         
         elif emotion_pattern == "declining" and emotion in ['sad', 'angry', 'fear']:
-            # 情绪在下降，提供更多温暖关怀
+            # Emotions are declining, provide more warm care
             supportive_responses = {
-                'sad': "最近情绪有些低落呢，要不要和我聊聊？我会一直陪着你。",
-                'angry': "看起来最近有些事情让你很烦心，深呼吸一下，咱们一起面对。",
-                'fear': "感受到你内心的不安，别怕，有什么事我们一起想办法。"
+                'sad': "Your mood seems a bit low lately. Want to talk with me? I'll always be here with you.",
+                'angry': "Looks like some things have been bothering you lately. Take a deep breath, let's face it together.",
+                'fear': "I can sense your inner unease. Don't be afraid, we can figure out whatever it is together."
             }
             return supportive_responses.get(emotion, responses[-1])
         
         elif emotion_pattern == "concerning":
-            # 持续负面情绪，给予特别关怀
+            # Persistent negative emotions, provide special care
             caring_responses = {
-                'sad': "注意到你最近情绪不太好，记住你并不孤单，我一直在这里。",
-                'angry': "看起来有很多事情让你困扰，要不要先休息一下，慢慢来？",
-                'fear': "感觉你一直很担心，这样很累吧？要不要说说让你担心的事？"
+                'sad': "I've noticed your mood hasn't been great lately. Remember you're not alone, I'm always here.",
+                'angry': "Looks like many things are troubling you. How about taking a break and going slowly?",
+                'fear': "I feel you've been worried. That must be exhausting, right? Want to talk about what's worrying you?"
             }
-            return caring_responses.get(emotion, "最近看起来很辛苦，要记得照顾好自己。")
+            return caring_responses.get(emotion, "It looks like things have been tough lately. Remember to take care of yourself.")
         
         # 根据置信度选择合适的回应风格
         if confidence > 0.85:
@@ -454,19 +454,19 @@ Please provide a natural and friendly response directly, no more than 40 words.
             else:
                 text = text[:35] + '...'
         
-        # 确保以适当的标点结尾
+        # Ensure appropriate punctuation at the end
         if not text.endswith(('。', '！', '？', '~', '.', '!', '?')):
             if emotion in ['happy', 'surprise']:
-                text += '！'
+                text += '!'
             elif emotion in ['sad', 'fear']:
-                text += '。'
+                text += '.'
             else:
                 text += '~'
         
         return text
     
     def _get_smart_fallback_response(self, emotion: str, confidence: float) -> str:
-        """获取智能离线回应 - 根据置信度、历史和上下文智能调整"""
+        """Get intelligent offline responses - intelligently adjust based on confidence, history and context"""
         responses = self.fallback_responses.get(emotion, [
             "I understand how you're feeling right now. Is there anything you'd like to share?"
         ])
@@ -495,60 +495,60 @@ Please provide a natural and friendly response directly, no more than 40 words.
         
         # Choose appropriate response style based on confidence level
         if confidence > 0.85:
-            # 高置信度：更直接、确定的回应
-            return responses[0] if responses else "从你的表情能看出很明确的情绪呢！"
+            # High confidence: more direct, confident responses
+            return responses[0] if responses else "I can clearly see your emotions from your expression!"
         elif confidence > 0.65:
-            # 中等置信度：平衡自然的回应
+            # Medium confidence: balanced natural responses
             mid_idx = len(responses) // 2
-            return responses[mid_idx] if responses else "能感受到你现在的心情变化。"
+            return responses[mid_idx] if responses else "I can sense your current mood changes."
         else:
-            # 低置信度：更温和、探索性的回应
+            # Low confidence: gentler, exploratory responses
             gentle_responses = {
-                'happy': "似乎心情不错？不管怎样，看到你我就很开心～",
-                'sad': "感觉可能有点不开心？如果想聊聊，我随时在这里。",
-                'angry': "似乎有些情绪波动，要不要说说是什么事？",
-                'neutral': "看起来还挺平静的，今天过得怎么样？",
-                'fear': "感觉有点不安？别担心，有什么事我们一起解决。",
-                'disgust': "看起来可能遇到了不太愉快的事？",
-                'surprise': "好像有什么让你觉得意外的事？"
+                'happy': "You seem to be in a good mood? Either way, seeing you makes me happy~",
+                'sad': "Feeling a bit down perhaps? If you want to talk, I'm always here.",
+                'angry': "Seems like there might be some emotional turbulence. Want to talk about what's bothering you?",
+                'neutral': "You look quite calm. How was your day?",
+                'fear': "Feeling a bit uneasy? Don't worry, we can work through whatever it is together.",
+                'disgust': "Looks like you might have encountered something unpleasant?",
+                'surprise': "Something unexpected happen?"
             }
-            return gentle_responses.get(emotion, "不管你现在什么感受，我都在这里陪着你。")
+            return gentle_responses.get(emotion, "Whatever you're feeling right now, I'm here with you.")
     
     def generate_batch_responses(self, emotions: List[str]) -> Dict[str, str]:
-        """批量生成多个情绪的回应"""
+        """Generate responses for multiple emotions in batch"""
         responses = {}
         for emotion in emotions:
             responses[emotion] = self.generate_response(emotion)
         return responses
     
     def get_conversation_summary(self) -> str:
-        """获取对话历史摘要"""
+        """Get conversation history summary"""
         if not self.emotion_history:
-            return "还没有情绪记录"
+            return "No emotion records yet"
         
         recent = self.emotion_history[-3:]
         emotions = [h['emotion'] for h in recent]
         
         if len(set(emotions)) == 1:
-            return f"最近情绪比较稳定，主要是{emotions[0]}"
+            return f"Recent emotions are quite stable, mainly {emotions[0]}"
         else:
-            return f"情绪有变化：{' → '.join(emotions[-3:])}"
+            return f"Emotions have changed: {' → '.join(emotions[-3:])}"
 
 
-# 为了向后兼容，保留原有的函数接口
+# For backward compatibility, keep the original function interface
 def generate_emotion_response(emotion: str, config: Dict = None) -> str:
     """
-    生成情绪回应（向后兼容函数）
+    Generate emotion response (backward compatibility function)
     
     Args:
-        emotion: 情绪类型
-        config: 配置信息
+        emotion: emotion type
+        config: configuration information
         
     Returns:
-        回应文本
+        response text
     """
     if config is None:
-        # 默认配置
+        # Default configuration
         config = {
             'api': {
                 'provider': 'deepseek',
@@ -567,7 +567,7 @@ def generate_emotion_response(emotion: str, config: Dict = None) -> str:
 
 
 if __name__ == "__main__":
-    # 测试硅基流动API调用
+    # Test SiliconFlow API call
     test_config = {
         'api': {
             'provider': 'siliconflow',
@@ -581,26 +581,26 @@ if __name__ == "__main__":
         }
     }
     
-    print("🧪 测试硅基流动API调用 (免费DeepSeek模型):")
+    print("🧪 Testing SiliconFlow API call (Free DeepSeek model):")
     print("=" * 50)
     
     generator = EmotionTextGenerator(test_config)
     
-    # 测试单个情绪
+    # Test single emotion
     test_emotion = 'happy'
     test_confidence = 0.9
-    test_context = {'user_input': '今天工作很顺利，心情特别好！'}
+    test_context = {'user_input': 'Work went really well today, feeling great!'}
     
-    print(f"📸 测试情绪: {test_emotion}")
-    print(f"🎯 置信度: {test_confidence}")
-    print(f"💬 用户说明: {test_context['user_input']}")
+    print(f"📸 Test emotion: {test_emotion}")
+    print(f"🎯 Confidence: {test_confidence}")
+    print(f"💬 User input: {test_context['user_input']}")
     print()
     
     response = generator.generate_response(test_emotion, test_confidence, test_context)
-    print(f"🤖 AI回应: {response}")
+    print(f"🤖 AI Response: {response}")
     print()
     
-    # 测试不同情绪
+    # Test different emotions
     emotions_to_test = ['sad', 'angry']
     for emotion in emotions_to_test:
         response = generator.generate_response(emotion, 0.8)
