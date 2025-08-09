@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: emotion-recognition-webapp
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "./start.sh"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHONPATH
+        value: "/opt/render/project/src:/opt/render/project"
+      - key: SILICONFLOW_API_KEY
+        sync: false  # 手动设置敏感环境变量
+      - key: DEEPSEEK_API_KEY
+        sync: false
+    disk:
+      name: emotion-models
+      mountPath: /opt/render/project/models
+      sizeGB: 3

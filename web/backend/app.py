@@ -15,7 +15,12 @@ import torch
 
 # Import custom modules
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os
+
+# 添加项目根目录到Python路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(current_dir))
+sys.path.insert(0, project_root)
 
 from src.inference.predictor import EmotionPredictor
 from src.visualization.emotion_visualizer import EmotionVisualizer
