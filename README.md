@@ -75,7 +75,7 @@ If you use this system in your research, please cite:
 ```bibtex
 @software{emotion_recognition_system,
   title={Emotion Recognition & Interactive System},
-  author={Your Name},
+  author={linkersea},
   year={2025},
   url={https://huggingface/linkersea/Emotion-recognition}
 }
@@ -91,7 +91,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Contact
 
-- GitHub: [your-github-username](https://github.com/linkersea)
+- GitHub: [linkersea](https://github.com/linkersea)
 - Email: charlpakino@gmail.com
 
 ---
