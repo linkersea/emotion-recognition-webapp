@@ -77,7 +77,7 @@ If you use this system in your research, please cite:
   title={Emotion Recognition & Interactive System},
   author={Your Name},
   year={2025},
-  url={https://huggingface.co/spaces/your-username/emotion-recognition-system}
+  url={https://huggingface/linkersea/Emotion-recognition}
 }
 ```
 
@@ -91,8 +91,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Contact
 
-- GitHub: [your-github-username](https://github.com/your-github-username)
-- Email: your.email@example.com
+- GitHub: [your-github-username](https://github.com/linkersea)
+- Email: charlpakino@gmail.com
 
 ---
 
