@@ -18,6 +18,8 @@ tags:
 - pytorch
 ---
 
+![Emotion Recognition Web App](web_screencut.png)
+
 # 😊 Emotion Recognition & Interactive System
 
 An advanced AI-powered emotion recognition system that analyzes facial expressions and provides intelligent emotional support responses.
