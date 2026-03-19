@@ -4,7 +4,7 @@ api:
   
   # 硅基流动 API (强烈推荐 - 价格便宜，稳定性好)
   siliconflow:
-    api_key: "sk-uxsiqasafikwfctaebknfpsfrvbnyyaxclygouotdjddnbyq"  # 在这里填入你的硅基流动API密钥 - 去 https://siliconflow.cn 注册
+    api_key: "your api key"  # 在这里填入你的硅基流动API密钥 - 去 https://siliconflow.cn 注册
     base_url: "https://api.siliconflow.cn/v1/chat/completions"
     model: "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"  # 免费模型
     max_tokens: 200
@@ -12,7 +12,7 @@ api:
     
   # DeepSeek API (备用)
   deepseek:
-    api_key: "sk-5de60e24de9f45f9ba529886982d8ad4"
+    api_key: "your api key"
     base_url: "https://api.deepseek.com/chat/completions"
     model: "deepseek-chat"
     max_tokens: 200
